@@ -23,3 +23,7 @@ playwright-report/
 blob-report/
 playwright/.cache/
 .playwright/
+
+# Cloudflare Wrangler (Workers Assets 배포)
+.wrangler/
+.dev.vars*

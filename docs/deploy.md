@@ -42,11 +42,14 @@ Node 설치 스크립트 (`scripts/install-node-synology.sh`)는 **x64 / arm64 /
 
 ---
 
+## Cloudflare Pages (권장)
+
 | 항목 | 값 |
 |------|-----|
 | Framework preset | None (Vite 직접 빌드) |
 | Build command | `npm run build` |
 | Build output directory | `dist` |
+| Deploy command | `npx wrangler deploy` (Workers Assets 자동 감지 시) |
 | Node version | 18+ |
 
 ### Git 연동 배포
@@ -61,7 +64,9 @@ Node 설치 스크립트 (`scripts/install-node-synology.sh`)는 **x64 / arm64 /
 
 ### SPA 라우팅
 
-`public/_redirects` 가 저장소에 포함되어 있어, `/today`, `/week` 등 직접 URL 접근 시 `index.html` 로 fallback 됩니다.
+Cloudflare가 **Wrangler(Workers Assets)** 로 배포할 때는 repo 루트 `wrangler.jsonc` 의 `not_found_handling: "single-page-application"` 이 `/today` 등을 처리합니다.
+
+`public/_redirects` (`/* /index.html 200`) 는 Wrangler 와 **충돌(infinite loop)** 하므로 사용하지 않습니다.
 
 ---
 
