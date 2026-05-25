@@ -78,22 +78,15 @@ async function save(): Promise<void> {
   }
   try {
     if (current.value) {
-      await ElMessageBox.confirm(
-        `${weekdayLabel(activeWeekday.value)}요일 기존 프리셋을 덮어씁니다.`,
-        '저장',
-        { type: 'warning' },
-      )
+      await svc.updatePreset(current.value.preset.id, name, validItems)
+    } else {
+      await svc.savePresetForWeekday(activeWeekday.value, name, validItems, null)
     }
-    await svc.savePresetForWeekday(
-      activeWeekday.value,
-      name,
-      validItems,
-      current.value?.preset.id ?? null,
-    )
     ElMessage.success('저장했습니다.')
     await reload()
-  } catch {
-    /* cancel */
+  } catch (e: unknown) {
+    console.error(e)
+    ElMessage.error('저장에 실패했습니다.')
   }
 }
 

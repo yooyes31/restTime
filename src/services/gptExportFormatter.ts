@@ -5,6 +5,8 @@ import { InBodyService } from '@/services/inBodyService'
 import { MealLogService, type MealEntry } from '@/services/mealLogService'
 import { SettingsService } from '@/services/settingsService'
 import { WeeklySummaryAggregator } from '@/services/weeklySummaryAggregator'
+import { WorkoutDayLogService, type WorkoutDayLogEntry } from '@/services/workoutDayLogService'
+import { WorkoutPresetService } from '@/services/workoutPresetService'
 import { WorkoutService, type WorkoutSession } from '@/services/workoutService'
 import type { MealType } from '@/types/domain'
 import { enumerateIsoRange, getWeekRange, type WeekRange } from '@/utils/weekRange'
@@ -23,6 +25,8 @@ const MEAL_LABELS: Record<MealType, string> = {
 export class GptExportFormatter {
   private readonly meals: MealLogService
   private readonly workout: WorkoutService
+  private readonly dayLog: WorkoutDayLogService
+  private readonly workoutPreset: WorkoutPresetService
   private readonly inbody: InBodyService
   private readonly settings: SettingsService
   private readonly weekly: WeeklySummaryAggregator
@@ -30,6 +34,8 @@ export class GptExportFormatter {
   constructor(db: LocalDatabase) {
     this.meals = new MealLogService(db)
     this.workout = new WorkoutService(db)
+    this.dayLog = new WorkoutDayLogService(db)
+    this.workoutPreset = new WorkoutPresetService(db)
     this.inbody = new InBodyService(db)
     this.settings = new SettingsService(db)
     this.weekly = new WeeklySummaryAggregator(db)
@@ -61,7 +67,7 @@ export class GptExportFormatter {
         : ''
     lines.push(`- 합계: ${Math.round(totals.kcal)} kcal, ${totals.protein_g.toFixed(1)}g 단백질${targetPart}`)
     lines.push('', '# 운동')
-    lines.push(formatWorkoutLines(sessions))
+    lines.push(...(await this.formatWorkoutBlock(date, sessions)))
     lines.push('', '# 적자')
     lines.push(formatDeficitLine(burn, totals.kcal))
 
@@ -107,10 +113,14 @@ export class GptExportFormatter {
 
     for (const day of summary.range.days) {
       const sessions = await this.workout.listByDate(day)
-      if (sessions.length === 0) continue
+      const dayLines = await this.formatWorkoutBlock(day, sessions)
+      const hasContent = dayLines.some((l) => !l.startsWith('- (기록 없음)'))
+      if (!hasContent) continue
       const w = weekdayLabel(isoDateToWeekday(day))
-      const detail = sessions.map((s) => `${s.name} ${s.minutes}분`).join(', ')
-      lines.push(`- ${w}: ${detail}`)
+      lines.push(`- ${w}:`)
+      for (const dl of dayLines) {
+        lines.push(`  ${dl}`)
+      }
     }
     lines.push(`- 이번 주: ${summary.workoutSessionCount}회`)
 
@@ -183,6 +193,37 @@ export class GptExportFormatter {
     return this.formatWeek(getWeekRange(anchorIso))
   }
 
+  /** 종목 일지 + 세션(메모 포함) */
+  private async formatWorkoutBlock(date: string, sessions: WorkoutSession[]): Promise<string[]> {
+    const lines: string[] = []
+    const entries = await this.dayLog.listByDate(date)
+
+    if (entries.length > 0) {
+      lines.push('## 종목')
+      for (const e of entries) {
+        lines.push(formatDayLogLine(e))
+      }
+    } else {
+      const preset = await this.workoutPreset.getForWeekday(isoDateToWeekday(date))
+      if (preset && preset.items.length > 0) {
+        lines.push('## 종목 (프리셋 템플릿)')
+        for (const it of preset.items) {
+          lines.push(formatPresetItemLine(it))
+        }
+      }
+    }
+
+    if (sessions.length > 0) {
+      lines.push('## 세션')
+      for (const s of sessions) {
+        lines.push(formatSessionLine(s))
+      }
+    }
+
+    if (lines.length === 0) return ['- (기록 없음)']
+    return lines
+  }
+
   private async loadTargets(): Promise<{
     burn: number | null
     proteinFactor: number
@@ -205,15 +246,35 @@ export class GptExportFormatter {
   }
 }
 
+function formatDayLogLine(e: WorkoutDayLogEntry): string {
+  const base = `- ${e.exercise_name} ${e.sets}×${e.reps}${formatWeight(e.weight_kg)}`
+  const memo = e.memo.trim()
+  return memo ? `${base} — ${memo}` : base
+}
+
+function formatPresetItemLine(it: {
+  exercise_name: string
+  sets: number
+  reps: number
+  weight_kg: number | null
+}): string {
+  return `- ${it.exercise_name} ${it.sets}×${it.reps}${formatWeight(it.weight_kg)}`
+}
+
+function formatSessionLine(s: WorkoutSession): string {
+  const base = `- ${s.name} ${s.minutes}분`
+  const memo = s.memo.trim()
+  return memo ? `${base} — ${memo}` : base
+}
+
+function formatWeight(kg: number | null): string {
+  return kg !== null && kg > 0 ? ` @ ${kg}kg` : ''
+}
+
 function formatMealLine(e: MealEntry): string {
   const label = MEAL_LABELS[e.meal_type] ?? e.meal_type
   const memo = e.memo.trim() || '(메모 없음)'
   return `- ${label}: ${memo} — ${Math.round(e.kcal)} kcal, ${e.protein_g.toFixed(1)}g`
-}
-
-function formatWorkoutLines(sessions: WorkoutSession[]): string {
-  if (sessions.length === 0) return '- (기록 없음)'
-  return sessions.map((s) => `- ${s.name} ${s.minutes}분`).join('\n')
 }
 
 function formatDeficitLine(burn: number | null, intakeKcal: number): string {

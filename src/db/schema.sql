@@ -52,8 +52,22 @@ CREATE TABLE IF NOT EXISTS workout_sessions (
   preset_id INTEGER REFERENCES workout_presets (id) ON DELETE SET NULL,
   name TEXT NOT NULL,
   minutes INTEGER NOT NULL DEFAULT 0,
+  memo TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS workout_day_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date TEXT NOT NULL,
+  sort_order INTEGER NOT NULL,
+  exercise_name TEXT NOT NULL,
+  sets INTEGER NOT NULL,
+  reps INTEGER NOT NULL,
+  weight_kg REAL,
+  memo TEXT NOT NULL DEFAULT ''
+);
+
+CREATE INDEX IF NOT EXISTS idx_workout_day_log_date ON workout_day_log (date);
 
 CREATE TABLE IF NOT EXISTS inbody_logs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,5 +84,5 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT NOT NULL
 );
 
--- 마이그레이션 버전 bump (후속 DDL 추가 시 증분)
+-- 마이그레이션 버전: 후속 DDL 은 migrations.ts 에서 bump
 UPDATE schema_version SET version = 1 WHERE id = 1;

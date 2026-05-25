@@ -157,7 +157,7 @@ async function move(entry: MealEntry, delta: -1 | 1): Promise<void> {
 
     <TodaySummaryCard ref="summaryRef" :intake-kcal="totals.kcal" :intake-protein-g="totals.protein_g" />
 
-    <TodayWorkoutPresetSection :weekday="todayWeekday" :data="workoutPresetToday" />
+    <TodayWorkoutPresetSection :date="activeDate" :weekday="todayWeekday" :data="workoutPresetToday" />
 
     <TodayWorkoutSessionsSection
       ref="sessionsRef"

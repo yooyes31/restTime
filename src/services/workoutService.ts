@@ -8,12 +8,14 @@ export interface WorkoutSession {
   preset_id: number | null
   name: string
   minutes: number
+  memo: string
 }
 
 export interface WorkoutSessionInput {
   date: string
   name: string
   minutes: number
+  memo?: string
   preset_id?: number | null
 }
 
@@ -32,7 +34,7 @@ export class WorkoutService {
 
   async listByDate(date: string): Promise<WorkoutSession[]> {
     const rows = await this.db.query<Record<string, SqlValue>>(
-      `SELECT id, date, preset_id, name, minutes
+      `SELECT id, date, preset_id, name, minutes, memo
        FROM workout_sessions WHERE date = ? ORDER BY created_at ASC, id ASC`,
       [date],
     )
@@ -52,8 +54,8 @@ export class WorkoutService {
     const name = input.name.trim()
     if (!name) throw new Error('운동 이름을 입력해 주세요.')
     await this.db.exec(
-      `INSERT INTO workout_sessions (date, preset_id, name, minutes) VALUES (?, ?, ?, ?)`,
-      [input.date, input.preset_id ?? null, name, input.minutes],
+      `INSERT INTO workout_sessions (date, preset_id, name, minutes, memo) VALUES (?, ?, ?, ?, ?)`,
+      [input.date, input.preset_id ?? null, name, input.minutes, (input.memo ?? '').trim()],
     )
     const idRow = await this.db.query<Record<string, SqlValue>>('SELECT last_insert_rowid() AS id')
     return Math.trunc(toNumber(idRow[0]?.id))
@@ -61,7 +63,7 @@ export class WorkoutService {
 
   async updateSession(
     id: number,
-    patch: Partial<Pick<WorkoutSessionInput, 'name' | 'minutes' | 'preset_id'>>,
+    patch: Partial<Pick<WorkoutSessionInput, 'name' | 'minutes' | 'preset_id' | 'memo'>>,
   ): Promise<void> {
     const parts: string[] = []
     const params: SqlValue[] = []
@@ -76,6 +78,10 @@ export class WorkoutService {
     if (patch.preset_id !== undefined) {
       parts.push('preset_id = ?')
       params.push(patch.preset_id)
+    }
+    if (patch.memo !== undefined) {
+      parts.push('memo = ?')
+      params.push(patch.memo.trim())
     }
     if (parts.length === 0) return
     params.push(id)
@@ -101,5 +107,6 @@ function normalize(raw: Record<string, SqlValue>): WorkoutSession {
     preset_id: pid === null || pid === undefined || pid === '' ? null : Math.trunc(toNumber(pid)),
     name: String(raw.name ?? ''),
     minutes: Math.trunc(toNumber(raw.minutes)),
+    memo: String(raw.memo ?? ''),
   }
 }

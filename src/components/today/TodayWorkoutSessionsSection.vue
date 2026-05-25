@@ -26,6 +26,7 @@ const editingId = ref<number | null>(null)
 const form = ref({
   name: '',
   minutes: 30,
+  memo: '',
   linkPreset: false,
 })
 
@@ -46,6 +47,7 @@ function openCreate(fromPreset = false): void {
   form.value = {
     name: fromPreset && props.todayPreset ? props.todayPreset.preset.name : '',
     minutes: 30,
+    memo: '',
     linkPreset: fromPreset && Boolean(props.todayPreset),
   }
   dialogOpen.value = true
@@ -56,6 +58,7 @@ function openEdit(row: WorkoutSession): void {
   form.value = {
     name: row.name,
     minutes: row.minutes,
+    memo: row.memo,
     linkPreset: row.preset_id !== null,
   }
   dialogOpen.value = true
@@ -75,6 +78,7 @@ async function saveForm(): Promise<void> {
         date: props.date,
         name,
         minutes: form.value.minutes,
+        memo: form.value.memo,
         preset_id: presetId,
       })
       ElMessage.success('운동 세션을 추가했습니다.')
@@ -82,6 +86,7 @@ async function saveForm(): Promise<void> {
       await svc.updateSession(editingId.value, {
         name,
         minutes: form.value.minutes,
+        memo: form.value.memo,
         preset_id: presetId,
       })
       ElMessage.success('저장했습니다.')
@@ -128,6 +133,7 @@ defineExpose({ reload })
         <div class="main">
           <strong>{{ s.name }}</strong>
           <span class="meta">{{ s.minutes }}분</span>
+          <span v-if="s.memo" class="meta memo-preview">{{ s.memo }}</span>
           <el-tag v-if="s.preset_id" size="small" type="info">프리셋 연결</el-tag>
         </div>
         <div class="acts">
@@ -144,6 +150,9 @@ defineExpose({ reload })
         </el-form-item>
         <el-form-item label="시간(분)" required>
           <el-input-number v-model="form.minutes" :min="1" :step="5" controls-position="right" class="full" />
+        </el-form-item>
+        <el-form-item label="메모">
+          <el-input v-model="form.memo" type="textarea" :rows="2" placeholder="세트·종목·느낀 점 등" />
         </el-form-item>
         <el-form-item v-if="todayPreset">
           <el-checkbox v-model="form.linkPreset">오늘 프리셋({{ todayPreset.preset.name }}) 연결</el-checkbox>
@@ -197,6 +206,9 @@ defineExpose({ reload })
 }
 .meta {
   color: var(--el-text-color-secondary);
+}
+.memo-preview {
+  font-size: 12px;
 }
 .acts {
   flex-shrink: 0;

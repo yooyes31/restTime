@@ -58,6 +58,21 @@ export class WorkoutPresetService {
     return rows.map(normalizeItem)
   }
 
+  /** 기존 프리셋 이름·종목 갱신 (id 유지 — 세션 preset_id 보존) */
+  async updatePreset(presetId: number, name: string, items: WorkoutPresetItemInput[]): Promise<void> {
+    await this.db.exec('UPDATE workout_presets SET name = ? WHERE id = ?', [name.trim(), presetId])
+    await this.db.exec('DELETE FROM workout_preset_items WHERE preset_id = ?', [presetId])
+    let order = 0
+    for (const it of items) {
+      await this.db.exec(
+        `INSERT INTO workout_preset_items (preset_id, sort_order, exercise_name, sets, reps, weight_kg)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [presetId, order, it.exercise_name.trim(), it.sets, it.reps, it.weight_kg ?? null],
+      )
+      order += 1
+    }
+  }
+
   /** 요일 프리셋 저장 — existingId 있으면 해당 preset+items 전부 교체 */
   async savePresetForWeekday(
     weekday: Weekday,
