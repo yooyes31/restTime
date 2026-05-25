@@ -139,7 +139,7 @@ async function copyMarkdown(): Promise<void> {
   padding: var(--spacing, 16px);
   max-width: 800px;
   margin: 0 auto;
-  padding-bottom: calc(var(--spacing, 16px) + 56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: var(--spacing, 16px);
 }
 .head {
   margin-bottom: 12px;

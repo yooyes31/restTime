@@ -276,7 +276,7 @@ async function move(entry: MealEntry, delta: -1 | 1): Promise<void> {
 <style scoped>
 .view {
   padding: var(--spacing, 16px);
-  padding-bottom: calc(var(--spacing, 16px) + 56px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: var(--spacing, 16px);
   max-width: 720px;
   margin: 0 auto;
 }

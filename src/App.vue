@@ -35,13 +35,18 @@ const tabs = [
 
 <style scoped>
 .app-root {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
   background-color: var(--el-bg-color);
 }
 .shell {
-  min-height: 100dvh;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .topbar.safe-top {
+  flex-shrink: 0;
   padding-top: max(12px, env(safe-area-inset-top));
   padding-left: calc(16px + env(safe-area-inset-left));
   padding-right: calc(16px + env(safe-area-inset-right));
@@ -53,10 +58,16 @@ const tabs = [
 }
 .main-pane {
   flex: 1;
-  overflow: auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0;
 }
-/* 한 클래스에 패딩/레이아웃 묶음: .tab-bar.el-footer 단독 패딩:0 규칙이 아래 패딩을 덮어쓰면 안 됨 */
+/* 하단 탭 — viewport 하단 고정(본문 스크롤과 분리) */
 .tab-bar.el-footer {
+  position: relative;
+  z-index: 10;
   margin: 0;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -64,6 +75,7 @@ const tabs = [
   gap: 4px;
   justify-content: space-around;
   align-items: center;
+  min-height: var(--tab-bar-height, 56px);
   padding: 8px calc(12px + env(safe-area-inset-left))
     max(8px, env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-right));
   border-top: 1px solid var(--el-border-color);
