@@ -1,0 +1,25 @@
+# 의존성 / 빌드
+node_modules
+dist
+dev-dist
+
+# 로컬 환경변수 (Client ID 등)
+.env
+.env.local
+.env.*.local
+
+# OS / 에디터
+.DS_Store
+*.swp
+*.swo
+
+# 로그 / 캐시
+*.log
+.cache
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.playwright/

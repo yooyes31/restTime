@@ -1,0 +1,35 @@
+/** 전역 레이아웃·터치 타깃 — Issue #11 */
+
+:root {
+  --spacing: 16px;
+  --touch-min: 44px;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+/* 주요 탭·네비·복사 등 터치 영역 최소 44px (모바일 스모크) */
+.touch-target {
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
+}
+
+@media (pointer: coarse) {
+  .touch-row .el-button {
+    min-height: var(--touch-min);
+  }
+}
+
+/* 주간·GPT 표 가로 스크롤 (좁은 화면) */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll :deep(.el-table) {
+  min-width: 520px;
+}
