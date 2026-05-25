@@ -22,7 +22,25 @@ npm run preview
 
 ---
 
-## Cloudflare Pages (권장)
+## Synology NAS (Web Station · Node 없음)
+
+패키지 센터에 Node.js 가 없거나 CPU 가 **ppc**(구형 PowerPC) 인 경우, **NAS 에서 빌드하지 않습니다.**
+
+| 단계 | Mac | NAS |
+|------|-----|-----|
+| 빌드 | `npm run build` | — |
+| 배포 | `dist/` 내용 업로드 | `/volume2/web/resttime/` 등 |
+| 서빙 | — | **Web Station** document root |
+
+SSH 포트가 **2202** 이면 scp:
+
+```bash
+scp -P 2202 -r dist/* yooyes31@192.168.0.103:/volume2/web/resttime/
+```
+
+Node 설치 스크립트 (`scripts/install-node-synology.sh`)는 **x64 / arm64 / ppc64le** 만 지원합니다. `uname -m` 이 `ppc` 이면 공식 Node 바이너리가 없어 **Mac 빌드 + dist 복사**를 사용하세요.
+
+---
 
 | 항목 | 값 |
 |------|-----|
