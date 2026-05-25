@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>restTime 개인정보처리방침</title>
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.6; max-width: 720px; margin: 0 auto; padding: 24px 16px; color: #222; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.1rem; margin-top: 1.5rem; }
+    p, li { font-size: 0.95rem; }
+    a { color: #409eff; }
+    .muted { color: #666; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>restTime 개인정보처리방침</h1>
+  <p class="muted">시행일: 2026년 5월 23일</p>
+
+  <p>
+    restTime(이하 「앱」)은 식단·운동·인바디 기록을 위한 개인용 웹 앱(PWA)입니다.
+    본 방침은 앱 이용 시 개인정보가 어떻게 처리되는지 설명합니다.
+  </p>
+
+  <h2>1. 수집·처리하는 정보</h2>
+  <ul>
+    <li><strong>Google 계정 정보</strong>: Google 로그인 시 이메일 주소(표시·계정 구분용). OAuth를 통해 Google에서 받으며, 앱은 별도 서버에 저장하지 않습니다.</li>
+    <li><strong>건강·기록 데이터</strong>: 식단, 운동, 인바디 등 사용자가 입력한 내용. 기기 브라우저 내 SQLite에 저장됩니다.</li>
+    <li><strong>Google Drive 백업</strong>: 사용자가 「Drive에 저장하기」를 선택한 경우, 데이터베이스 파일(<code>restTime/health.db</code>)이 <strong>해당 사용자 본인의 Google Drive</strong>에 저장됩니다.</li>
+  </ul>
+
+  <h2>2. 정보를 처리하는 주체</h2>
+  <p>
+    앱은 <strong>별도의 백엔드 서버를 운영하지 않습니다</strong>.
+    입력·저장·동기화는 사용자 기기와 사용자 본인 Google 계정 간에 이루어집니다.
+    개발자는 사용자 데이터에 접근·수집·보관하지 않습니다.
+  </p>
+
+  <h2>3. Google OAuth 및 Drive API</h2>
+  <p>
+    Google 로그인 및 Drive 동기화는 Google Identity Services 및 Google Drive API를 사용합니다.
+    Google의 데이터 처리에 관해서는
+    <a href="https://policies.google.com/privacy" rel="noopener noreferrer">Google 개인정보처리방침</a>을 참고하세요.
+  </p>
+  <p>앱이 요청하는 권한 범위:</p>
+  <ul>
+    <li>이메일·프로필(로그인 표시)</li>
+    <li>Google Drive: 앱이 생성·연동한 파일만 접근(<code>drive.file</code>)</li>
+  </ul>
+
+  <h2>4. 보관 기간</h2>
+  <ul>
+    <li>로컬 데이터: 사용자가 기기에서 삭제하거나 브라우저 저장소를 지울 때까지 기기에 남습니다.</li>
+    <li>Drive 백업: 사용자가 Google Drive에서 직접 삭제할 때까지 해당 Drive에 남습니다.</li>
+    <li>OAuth 세션: 브라우저 localStorage에 토큰이 일시 저장되며, 로그아웃 시 삭제됩니다.</li>
+  </ul>
+
+  <h2>5. 제3자 제공</h2>
+  <p>
+    개발자는 사용자 개인정보를 제3자에게 판매·제공하지 않습니다.
+    Google API 사용은 사용자가 선택한 동기화 기능 수행을 위한 것입니다.
+  </p>
+
+  <h2>6. 이용자 권리</h2>
+  <p>
+    로컬 기록은 앱에서 수정·삭제할 수 있습니다.
+    Drive 백업은 Google Drive에서 관리할 수 있습니다.
+    Google 계정 연동 해제는 앱 설정의 「로그아웃」 또는
+    <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer">Google 계정 권한</a>에서 할 수 있습니다.
+  </p>
+
+  <h2>7. 문의</h2>
+  <p>
+    개인정보 관련 문의:
+    <a href="https://github.com/yooyes31/restTime/issues" rel="noopener noreferrer">GitHub Issues</a>
+  </p>
+
+  <p><a href="/">← restTime 앱으로</a></p>
+</body>
+</html>

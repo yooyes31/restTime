@@ -41,11 +41,22 @@
 2. **외부** 선택(개인/소수 사용자면 Testing 로 충분한 경우 많음).
 3. 앱 이름 · 지원 이메일 등 필수 입력 후 저장.
 
-**테스트 사용자(External + Testing)**
+실제 배포 후 일반 사용자에게 열려면 **OAuth 동의 화면을 Production(게시)** 으로 전환합니다. restTime 은 `drive.file` 등 비민감 스코프 위주라 검증 없이 게시되는 경우가 많습니다(미검증 경고 화면은 사용자가 「고급 → 이동」으로 진행 가능).
 
-- 테스트 사용자 목록에 **로그인에 쓸 Google 계정**(본인 Gmail 등) 을 추가하지 않으면, 동의 화면에서 막힐 수 있습니다.
+**Production 게시 전 필수 URL** (앱과 함께 배포되는 정적 페이지):
 
-실제 배포 후 일반 사용자에게 열려면 앱 검증·게시 단계가 필요할 수 있습니다(개인용 PWA 면 테스트 사용자만으로도 개발 가능).
+| 문서 | Console 에 넣을 URL (배포 주소 기준) |
+|------|--------------------------------------|
+| 개인정보처리방침 | `https://YOUR_DEPLOY_URL/privacy/` |
+| 서비스 약관 | `https://YOUR_DEPLOY_URL/terms/` |
+
+예: Cloudflare Pages `https://resttime.pages.dev/privacy/` · `https://resttime.pages.dev/terms/`
+
+소스: [`public/privacy/`](../public/privacy/), [`public/terms/`](../public/terms/) — `npm run build` 시 `dist/` 에 포함됩니다.
+
+**게시 절차:** OAuth 동의 화면 → 앱 정보(홈페이지·개인정보처리방침·약관 URL) 저장 → **앱 게시(Publish app)** → Production.
+
+**테스트 사용자(External + Testing)** — Production 전까지는 아래만 해당:
 
 ---
 
